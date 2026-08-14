@@ -1,10 +1,5 @@
 import random
 
-MINA = "*"
-OCULTO = "."
-TESOURO = "$"
-SEGURA = "X"
-
 # Criar o tabuleiro
 def criar_tabuleiro(linhas, colunas):
     tabuleiro = []
@@ -13,7 +8,7 @@ def criar_tabuleiro(linhas, colunas):
         linha = []
 
         for j in range(colunas):
-            linha.append(OCULTO)
+            linha.append(".")
 
         tabuleiro.append(linha)
 
@@ -49,108 +44,73 @@ def mostrar_tabuleiro(tabuleiro):
     print()
 
 
-# Verificar se tem mina
+# Verificar se existe uma mina
 def tem_mina(minas, linha, coluna):
     for mina in minas:
-
         if mina[0] == linha and mina[1] == coluna:
             return True
 
     return False
 
 
-# Programa
-print("======================")
-print("     CAMPO MINADO")
-print("======================")
+# Programa principal
 
-linhas = int(input("Digite as linhas: "))
-colunas = int(input("Digite as colunas: "))
+print("=== CAMPO MINADO ===")
+
+linhas = int(input("Digite o número de linhas: "))
+colunas = int(input("Digite o número de colunas: "))
 quantidade_minas = int(input("Digite a quantidade de minas: "))
 
 tabuleiro = criar_tabuleiro(linhas, colunas)
-
 minas = criar_minas(linhas, colunas, quantidade_minas)
-
-# Criar o tesouro
-while True:
-    tesouro_linha = random.randint(0, linhas - 1)
-    tesouro_coluna = random.randint(0, colunas - 1)
-
-    if not tem_mina(minas, tesouro_linha, tesouro_coluna):
-        break
-
 
 vidas = 3
 pontos = 0
-casas_descobertas = 0
-
-casas_seguras = linhas * colunas - quantidade_minas
+casas_seguras = 0
 
 while vidas > 0:
 
     mostrar_tabuleiro(tabuleiro)
 
     print("Vidas:", vidas)
-    print(" Pontos:", pontos)
+    print("Pontos:", pontos)
 
-    linha = int(input("Escolha a linha: "))
-    coluna = int(input("Escolha a coluna: "))
+    linha = int(input("Digite a linha: "))
+    coluna = int(input("Digite a coluna: "))
 
     # Verificar se a posição existe
     if linha < 0 or linha >= linhas or coluna < 0 or coluna >= colunas:
-        print(" Essa posição não existe!")
+        print("Posição inválida!")
         continue
 
-    
-    if tabuleiro[linha][coluna] != OCULTO:
-        print(" Você já escolheu essa casa!")
+    # Verificar se já foi escolhida
+    if tabuleiro[linha][coluna] != ".":
+        print("Você já escolheu essa posição!")
         continue
 
-    
+    # Verificar se encontrou uma mina
     if tem_mina(minas, linha, coluna):
 
-        print(" BOOM!")
         print("Você encontrou uma mina!")
+        print("Você perdeu uma vida.")
 
         vidas = vidas - 1
-
-        print("Você perdeu uma vida!")
-
-        tabuleiro[linha][coluna] = MINA
+        tabuleiro[linha][coluna] = "*"
 
     else:
 
-        # Verificar tesouro
-        if linha == tesouro_linha and coluna == tesouro_coluna:
+        print("Casa segura!")
 
-            print(" VOCÊ ENCONTROU O TESOURO!")
-            print("+50 pontos!")
+        tabuleiro[linha][coluna] = "X"
+        pontos = pontos + 10
+        casas_seguras = casas_seguras + 1
 
-            pontos = pontos + 50
-
-            tabuleiro[linha][coluna] = TESOURO
-
-        else:
-
-            print("Casa segura!")
-            print("+10 pontos!")
-
-            pontos = pontos + 10
-
-            tabuleiro[linha][coluna] = SEGURA
-
-        casas_descobertas = casas_descobertas + 1
-
-    
-    if casas_descobertas == casas_seguras:
+    # Verificar vitória
+    if casas_seguras == linhas * colunas - quantidade_minas:
 
         print()
-        print("======================")
-        print("       VITÓRIA!")
-        print("======================")
-        print("Você encontrou todas as casas seguras!")
-        print(" Pontuação:", pontos)
+        print("=== VOCÊ VENCEU ===")
+        print("Pontuação:", pontos)
 
         mostrar_tabuleiro(tabuleiro)
 
@@ -160,16 +120,12 @@ while vidas > 0:
 if vidas == 0:
 
     print()
-    print("======================")
-    print("      DERROTA")
-    print("======================")
-    print("Você ficou sem vidas!")
-    print(" Pontuação:", pontos)
+    print("=== FIM DE JOGO ===")
+    print("Você perdeu!")
+    print("Pontuação:", pontos)
 
+    # Mostrar onde estavam as minas
     for mina in minas:
-        tabuleiro[mina[0]][mina[1]] = MINA
-
-    # Mostrar o tesouro
-    tabuleiro[tesouro_linha][tesouro_coluna] = TESOURO
+        tabuleiro[mina[0]][mina[1]] = "*"
 
     mostrar_tabuleiro(tabuleiro)
