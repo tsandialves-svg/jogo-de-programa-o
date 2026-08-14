@@ -1,131 +1,175 @@
 import random
-import time
- 
-OCULTA = "."
+
 MINA = "*"
-BANDEIRA = "B"
-ARQUIVO_RANKING = "ranking.txt"
- 
- 
+OCULTO = "."
+TESOURO = "$"
+SEGURA = "X"
 
- 
-def criar_matriz(linhas, colunas, valor):
-    return [[valor for _ in range(colunas)] for _ in range(linhas)]
- 
- 
-def posicionar_minas(linhas, colunas, qtd_minas):
-    minas = criar_matriz(linhas, colunas, False)
-    colocadas = 0
-    while colocadas < qtd_minas:
-        l, c = random.randint(0, linhas - 1), random.randint(0, colunas - 1)
-        if not minas[l][c]:
-            minas[l][c] = True
-            colocadas += 1
+# Criar o tabuleiro
+def criar_tabuleiro(linhas, colunas):
+    tabuleiro = []
+
+    for i in range(linhas):
+        linha = []
+
+        for j in range(colunas):
+            linha.append(OCULTO)
+
+        tabuleiro.append(linha)
+
+    return tabuleiro
+
+
+# Criar as minas
+def criar_minas(linhas, colunas, quantidade):
+    minas = []
+
+    while len(minas) < quantidade:
+        linha = random.randint(0, linhas - 1)
+        coluna = random.randint(0, colunas - 1)
+
+        if [linha, coluna] not in minas:
+            minas.append([linha, coluna])
+
     return minas
- 
- 
-def contar_vizinhas(minas, linha, coluna):
-    total = 0
-    for dl in (-1, 0, 1):
-        for dc in (-1, 0, 1):
-            l, c = linha + dl, coluna + dc
-            if (dl, dc) != (0, 0) and 0 <= l < len(minas) and 0 <= c < len(minas[0]):
-                if minas[l][c]:
-                    total += 1
-    return total
- 
- 
 
- 
-def mostrar_tabuleiro(visivel):
-    print("   " + " ".join(str(c) for c in range(len(visivel[0]))))
-    for i, linha in enumerate(visivel):
-        print(i, "|", " ".join(linha))
- 
- 
 
-def revelar(visivel, minas, linha, coluna):
-    if not (0 <= linha < len(minas) and 0 <= coluna < len(minas[0])):
-        return
-    if visivel[linha][coluna] != OCULTA:
-        return
- 
-    vizinhas = contar_vizinhas(minas, linha, coluna)
-    visivel[linha][coluna] = str(vizinhas) if vizinhas > 0 else " "
- 
-    if vizinhas == 0:
-        for dl in (-1, 0, 1):
-            for dc in (-1, 0, 1):
-                revelar(visivel, minas, linha + dl, coluna + dc)
- 
- 
-def venceu(visivel, minas):
-    for l in range(len(minas)):
-        for c in range(len(minas[0])):
-            if not minas[l][c] and visivel[l][c] == OCULTA:
-                return False
-    return True
- 
- 
+# Mostrar o tabuleiro
+def mostrar_tabuleiro(tabuleiro):
+    print()
 
- 
-def carregar_ranking():
-    try:
-        with open(ARQUIVO_RANKING, "r") as arquivo:
-            return [float(linha) for linha in arquivo.readlines()]
-    except FileNotFoundError:
-        return []
- 
- 
-def salvar_ranking(tempos):
-    melhores = sorted(tempos)[:5]
-    with open(ARQUIVO_RANKING, "w") as arquivo:
-        for tempo in melhores:
-            arquivo.write(f"{tempo:.2f}\n")
-    return melhores
- 
- 
-def mostrar_ranking(melhores):
-    print("\n Ranking dos melhores tempos:")
-    for pos, tempo in enumerate(melhores, start=1):
-        print(f"{pos}º lugar - {tempo:.2f} segundos")
- 
- 
+    for i in range(len(tabuleiro)):
+        print(i, end=" ")
 
-def jogar():
-    print("=== CAMPO MINADO ===")
-    linhas = int(input("Linhas: "))
-    colunas = int(input("Colunas: "))
-    qtd_minas = int(input("Quantidade de minas: "))
- 
-    minas = posicionar_minas(linhas, colunas, qtd_minas)
-    visivel = criar_matriz(linhas, colunas, OCULTA)
- 
-    inicio = time.time()
- 
-    while True:
-        mostrar_tabuleiro(visivel)
-        l = int(input("Linha: "))
-        c = int(input("Coluna: "))
- 
-        if minas[l][c]:
-            print("\n Você pisou em uma mina! Fim de jogo.")
-            break
- 
-        revelar(visivel, minas, l, c)
- 
-        if venceu(visivel, minas):
-            tempo_final = time.time() - inicio
-            mostrar_tabuleiro(visivel)
-            print(f"\n Você venceu em {tempo_final:.2f} segundos!")
- 
-            tempos = carregar_ranking()
-            tempos.append(tempo_final)
-            melhores = salvar_ranking(tempos)
-            mostrar_ranking(melhores)
-            break
- 
- 
-if __name__ == "__main__":
-    jogar()
- 
+        for j in range(len(tabuleiro[i])):
+            print(tabuleiro[i][j], end=" ")
+
+        print()
+
+    print()
+
+
+# Verificar se tem mina
+def tem_mina(minas, linha, coluna):
+    for mina in minas:
+
+        if mina[0] == linha and mina[1] == coluna:
+            return True
+
+    return False
+
+
+# Programa
+print("======================")
+print("     CAMPO MINADO")
+print("======================")
+
+linhas = int(input("Digite as linhas: "))
+colunas = int(input("Digite as colunas: "))
+quantidade_minas = int(input("Digite a quantidade de minas: "))
+
+tabuleiro = criar_tabuleiro(linhas, colunas)
+
+minas = criar_minas(linhas, colunas, quantidade_minas)
+
+# Criar o tesouro
+while True:
+    tesouro_linha = random.randint(0, linhas - 1)
+    tesouro_coluna = random.randint(0, colunas - 1)
+
+    if not tem_mina(minas, tesouro_linha, tesouro_coluna):
+        break
+
+
+vidas = 3
+pontos = 0
+casas_descobertas = 0
+
+casas_seguras = linhas * colunas - quantidade_minas
+
+while vidas > 0:
+
+    mostrar_tabuleiro(tabuleiro)
+
+    print("❤️ Vidas:", vidas)
+    print("⭐ Pontos:", pontos)
+
+    linha = int(input("Escolha a linha: "))
+    coluna = int(input("Escolha a coluna: "))
+
+    # Verificar se a posição existe
+    if linha < 0 or linha >= linhas or coluna < 0 or coluna >= colunas:
+        print("❌ Essa posição não existe!")
+        continue
+
+    
+    if tabuleiro[linha][coluna] != OCULTO:
+        print("⚠️ Você já escolheu essa casa!")
+        continue
+
+    
+    if tem_mina(minas, linha, coluna):
+
+        print(" BOOM!")
+        print("Você encontrou uma mina!")
+
+        vidas = vidas - 1
+
+        print("Você perdeu uma vida!")
+
+        tabuleiro[linha][coluna] = MINA
+
+    else:
+
+        # Verificar tesouro
+        if linha == tesouro_linha and coluna == tesouro_coluna:
+
+            print(" VOCÊ ENCONTROU O TESOURO!")
+            print("+50 pontos!")
+
+            pontos = pontos + 50
+
+            tabuleiro[linha][coluna] = TESOURO
+
+        else:
+
+            print("Casa segura!")
+            print("+10 pontos!")
+
+            pontos = pontos + 10
+
+            tabuleiro[linha][coluna] = SEGURA
+
+        casas_descobertas = casas_descobertas + 1
+
+    
+    if casas_descobertas == casas_seguras:
+
+        print()
+        print("======================")
+        print("      🎉 VITÓRIA!")
+        print("======================")
+        print("Você encontrou todas as casas seguras!")
+        print("⭐ Pontuação:", pontos)
+
+        mostrar_tabuleiro(tabuleiro)
+
+        break
+
+
+if vidas == 0:
+
+    print()
+    print("======================")
+    print("      DERROTA")
+    print("======================")
+    print("Você ficou sem vidas!")
+    print(" Pontuação:", pontos)
+
+    for mina in minas:
+        tabuleiro[mina[0]][mina[1]] = MINA
+
+    # Mostrar o tesouro
+    tabuleiro[tesouro_linha][tesouro_coluna] = TESOURO
+
+    mostrar_tabuleiro(tabuleiro)
