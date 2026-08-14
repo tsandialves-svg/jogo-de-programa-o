@@ -91,20 +91,20 @@ while vidas > 0:
 
     mostrar_tabuleiro(tabuleiro)
 
-    print("❤️ Vidas:", vidas)
-    print("⭐ Pontos:", pontos)
+    print("Vidas:", vidas)
+    print(" Pontos:", pontos)
 
     linha = int(input("Escolha a linha: "))
     coluna = int(input("Escolha a coluna: "))
 
     # Verificar se a posição existe
     if linha < 0 or linha >= linhas or coluna < 0 or coluna >= colunas:
-        print("❌ Essa posição não existe!")
+        print(" Essa posição não existe!")
         continue
 
     
     if tabuleiro[linha][coluna] != OCULTO:
-        print("⚠️ Você já escolheu essa casa!")
+        print(" Você já escolheu essa casa!")
         continue
 
     
@@ -147,10 +147,10 @@ while vidas > 0:
 
         print()
         print("======================")
-        print("      🎉 VITÓRIA!")
+        print("       VITÓRIA!")
         print("======================")
         print("Você encontrou todas as casas seguras!")
-        print("⭐ Pontuação:", pontos)
+        print(" Pontuação:", pontos)
 
         mostrar_tabuleiro(tabuleiro)
 
