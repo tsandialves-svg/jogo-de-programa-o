@@ -1,6 +1,6 @@
 import random
 
-# Criar o tabuleiro
+# esta parte cria a tabela do campo
 def criar_tabuleiro(linhas, colunas):
     tabuleiro = []
 
@@ -15,7 +15,7 @@ def criar_tabuleiro(linhas, colunas):
     return tabuleiro
 
 
-# Criar as minas
+# define as minas que vai ter no campo
 def criar_minas(linhas, colunas, quantidade):
     minas = []
 
@@ -29,7 +29,7 @@ def criar_minas(linhas, colunas, quantidade):
     return minas
 
 
-# Mostrar o tabuleiro
+#Mostra o tabuleiro
 def mostrar_tabuleiro(tabuleiro):
     print()
 
@@ -43,8 +43,7 @@ def mostrar_tabuleiro(tabuleiro):
 
     print()
 
-
-# Verificar se existe uma mina
+#define a posição das minas
 def tem_mina(minas, linha, coluna):
     for mina in minas:
         if mina[0] == linha and mina[1] == coluna:
@@ -52,8 +51,7 @@ def tem_mina(minas, linha, coluna):
 
     return False
 
-
-# Programa principal
+#começo do jogo e definições
 
 print("=== CAMPO MINADO ===")
 
