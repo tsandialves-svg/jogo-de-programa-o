@@ -20,12 +20,20 @@ def criar_tabuleiro(linhas, colunas):
 def criar_minas(linhas, colunas, quantidade):
     minas = []
 
-    while len(minas) < quantidade:
-        linha = random.randint(0, linhas - 1)
-        coluna = random.randint(0, colunas - 1)
+    # Cria todas as posições possíveis
+    posicoes = []
 
-        if [linha, coluna] not in minas:
-            minas.append([linha, coluna])
+    for linha in range(linhas):
+        for coluna in range(colunas):
+            posicoes.append([linha, coluna])
+
+    # Escolhe uma posição aleatória para as minas
+    for i in range(quantidade):
+        mina = random.choice(posicoes)
+
+        minas.append(mina)
+
+        posicoes.remove(mina)
 
     return minas
 
@@ -34,28 +42,27 @@ def criar_minas(linhas, colunas, quantidade):
 def mostrar_tabuleiro(tabuleiro):
     print()
 
-    # Número das colunas
     print("  ", end="")
 
-    for i in range(len(tabuleiro[0])):
-        print(i, end=" ")
+    for coluna in range(len(tabuleiro[0])):
+        print(coluna, end=" ")
 
     print()
 
-    # Tabuleiro
-    for i in range(len(tabuleiro)):
-        print(i, end=" ")
+    for linha in range(len(tabuleiro)):
+        print(linha, end=" ")
 
-        for j in range(len(tabuleiro[i])):
-            print(tabuleiro[i][j], end=" ")
+        for coluna in range(len(tabuleiro[linha])):
+            print(tabuleiro[linha][coluna], end=" ")
 
         print()
 
     print()
 
 
-# Verifica se existe uma mina
+# Verifica se realmente existe uma mina la posição escolhida1
 def tem_mina(minas, linha, coluna):
+
     for mina in minas:
 
         if mina[0] == linha and mina[1] == coluna:
@@ -64,24 +71,33 @@ def tem_mina(minas, linha, coluna):
     return False
 
 
-# Conta as minas ao redor
+# Conta as minas próximas da posição escolhida
 def contar_minas(minas, linha, coluna):
+
     quantidade = 0
 
     for mina in minas:
 
-        diferenca_linha = abs(mina[0] - linha)
-        diferenca_coluna = abs(mina[1] - coluna)
+        linha_mina = mina[0]
+        coluna_mina = mina[1]
 
-        if diferenca_linha <= 1 and diferenca_coluna <= 1:
-            if diferenca_linha != 0 or diferenca_coluna != 0:
-                quantidade = quantidade + 1
+        if linha_mina >= linha - 1 and linha_mina <= linha + 1:
+            if coluna_mina >= coluna - 1 and coluna_mina <= coluna + 1:
+
+                if linha_mina != linha or coluna_mina != coluna:
+                    quantidade = quantidade + 1
 
     return quantidade
 
 
-# Escolha da dificuldade
-print("=== CAMPO MINADO ===")
+#começo do jogo
+print("==========================")
+print("       CAMPO MINADO")
+print("==========================")
+
+linhas = int(input("Digite as linhas: "))
+colunas = int(input("Digite as colunas: "))
+
 print()
 print("Escolha a dificuldade:")
 print("1 - Fácil")
@@ -90,67 +106,71 @@ print("3 - Difícil")
 
 dificuldade = int(input("Escolha: "))
 
-linhas = int(input("Digite o número de linhas: "))
-colunas = int(input("Digite o número de colunas: "))
 
+# Define a dificuldade
 if dificuldade == 1:
     quantidade_minas = 3
     vidas = 5
+    dicas = 3
 
 elif dificuldade == 2:
     quantidade_minas = 5
     vidas = 3
+    dicas = 2
 
 else:
-    quantidade_minas = 8
+    quantidade_minas = 7
     vidas = 2
+    dicas = 1
 
 
-# Cria o jogo
+# Cria o tabuleiro com as linhas e as colunas definidas pelo jogador
 tabuleiro = criar_tabuleiro(linhas, colunas)
 minas = criar_minas(linhas, colunas, quantidade_minas)
 
 pontos = 0
 casas_seguras = 0
-dicas = 3
 
-casas_necessarias = linhas * colunas - quantidade_minas
+total_casas_seguras = linhas * colunas - quantidade_minas
 
 
-# Começa o jogo
+# Jogo
 while vidas > 0:
 
     mostrar_tabuleiro(tabuleiro)
 
     print("Vidas:", vidas)
     print("Pontos:", pontos)
-    print("Dicas restantes:", dicas)
+    print("Dicas:", dicas)
 
     print()
     print("1 - Jogar")
     print("2 - Usar dica")
 
-    opcao = int(input("Escolha uma opção: "))
+    opcao = int(input("Escolha: "))
 
-    # Jogar
+
+    # para começar o jogo
     if opcao == 1:
 
         linha = int(input("Digite a linha: "))
         coluna = int(input("Digite a coluna: "))
 
-        # Verifica posição
-        if linha < 0 or linha >= linhas or coluna < 0 or coluna >= colunas:
-
-            print("Posição inválida!")
+        # Verifica se a posição escolhida realmente existe
+        if linha < 0 or linha >= linhas:
+            print("Linha inválida!")
             continue
 
-        # Verifica se já foi escolhida
+        if coluna < 0 or coluna >= colunas:
+            print("Coluna inválida!")
+            continue
+
+        # Verifica se a casa já foi escolhida
         if tabuleiro[linha][coluna] != ".":
-
-            print("Você já escolheu essa posição!")
+            print("Você já escolheu essa casa!")
             continue
 
-        # Verifica mina
+        # Verifica se tem mina na posição escolhida
         if tem_mina(minas, linha, coluna):
 
             print("Você encontrou uma mina!")
@@ -164,78 +184,71 @@ while vidas > 0:
 
             quantidade = contar_minas(minas, linha, coluna)
 
-            print("Casa segura!")
-
-            # Mostra quantas minas existem perto
-            if quantidade == 0:
-                tabuleiro[linha][coluna] = "0"
-                print("Não existem minas próximas.")
-
-            else:
-                tabuleiro[linha][coluna] = str(quantidade)
-                print("Existem", quantidade, "mina(s) próxima(s).")
+            tabuleiro[linha][coluna] = str(quantidade)
 
             pontos = pontos + 10
             casas_seguras = casas_seguras + 1
 
-        # Verifica vitória
-        if casas_seguras == casas_necessarias:
+            print("Casa segura!")
+            print("Existem", quantidade, "minas perto dessa casa.")
+            print("Você ganhou 10 pontos.")
+
+        # caso jogador ganhe
+        if casas_seguras == total_casas_seguras:
 
             print()
-            print("=== VOCÊ VENCEU ===")
-            print("Pontuação:", pontos)
+            print("==========================")
+            print("       VOCÊ VENCEU!")
+            print("==========================")
+
+            print("Pontos:", pontos)
 
             mostrar_tabuleiro(tabuleiro)
 
             break
 
 
-    # Usar dica
     elif opcao == 2:
 
         if dicas > 0:
 
-            linha = int(input("Digite a linha para receber a dica: "))
-            coluna = int(input("Digite a coluna para receber a dica: "))
+            linha = int(input("Digite a linha: "))
+            coluna = int(input("Digite a coluna: "))
 
-            if linha < 0 or linha >= linhas or coluna < 0 or coluna >= colunas:
+            if linha < 0 or linha >= linhas:
+                print("Linha inválida!")
+                continue
 
-                print("Posição inválida!")
+            if coluna < 0 or coluna >= colunas:
+                print("Coluna inválida!")
+                continue
 
-            elif tabuleiro[linha][coluna] != ".":
+            quantidade = contar_minas(minas, linha, coluna)
 
-                print("Essa posição já foi escolhida!")
+            print("Existem", quantidade, "minas perto dessa casa.")
 
-            else:
-
-                quantidade = contar_minas(minas, linha, coluna)
-
-                print("Existem", quantidade, "mina(s) perto dessa posição.")
-
-                dicas = dicas - 1
-                pontos = pontos - 5
-
-                print("Você gastou uma dica e perdeu 5 pontos.")
+            dicas = dicas - 1
+            pontos = pontos - 20
 
         else:
-
-            print("Você não possui mais dicas!")
+            print("Você não tem mais dicas.")
 
 
     else:
-
         print("Opção inválida!")
 
 
-# Se perder todas as vidas
+# caso o jogador perca
 if vidas == 0:
 
     print()
-    print("=== FIM DE JOGO ===")
-    print("Você perdeu!")
-    print("Pontuação:", pontos)
+    print("==========================")
+    print("       VOCÊ PERDEU!")
+    print("==========================")
 
-    # Mostra todas as minas
+    print("Pontos:", pontos)
+
+    # Mostra o local das minas no tabuleiro com um asterisco
     for mina in minas:
         tabuleiro[mina[0]][mina[1]] = "*"
 
