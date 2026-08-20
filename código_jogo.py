@@ -206,7 +206,7 @@ while vidas > 0:
             mostrar_tabuleiro(tabuleiro)
 
             break
-
+#se escolher a opção da dica
 
     elif opcao == 2:
 
